@@ -1,0 +1,64 @@
+---
+title: "Basic Stats"
+author: "jeff macinnes"
+date: "January 24, 2017"
+output: 
+  github_document:
+    toc: true
+  html_document:
+    toc: true
+---
+The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using RStudio, so if you haven't already download and install both R and RStudio.
+
+# The Data
+In order to have some data to play with, there is a simulated datafile in `data/exampleData.tsv`
+
+This dataset has 40 subjects. For each subject we have values for IQ, and fixation time on the nose of various image categories. So we have:
+
+* Dependent Variables (DV):
+    + __IQ__: subject IQ score
+    + __noseDwellTime__: time spent fixating on the nose
+  
+And we measured __noseDwellTime__ across 3 different image categories. So, one independent variable (IV) with 3 levels
+
+* Independent Variable levels:
+    + __movie__: faces of movie stars
+    + __athlete__: faces of athletes
+    + __nobel__: faces of Nobel laureates
+
+
+So, lets's load the dataset:
+```{r}
+# if you haven't already, set your working directory to 'stats_intro'
+#setwd("<dirPath>/stats_intro")
+
+# read the data, store in variable called 'dt
+dt <- read.csv('data/exampleData.tsv', sep='\t', row.names=1)
+
+# print the first few rows
+head(dt, n=5)
+```
+
+You can see all of our variables. Each subject has an IQ score and average noseDwellTimes for Movie stars, Athletes, and Nobel. 
+
+Notice that our table has one row per subject, and multiple *observations* for each subject in different columns. When the table is organized like this, it is referred to as *wide-format* 
+
+### Quick data summary
+Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects come (you'll need **inferential statistics** for that...don't worry, it's coming). Let's get some basic descriptive stats on this dataset.
+
+```{r}
+# if you need to install the psych library:
+# install.packages("psych", dependencies=TRUE)
+library(psych)  # this is an external library that has some really useful tools within it
+
+describe(dt)
+```
+
+You can see, for instance, that subjects spent an average of 249.81 ms looking at the noses of movie stars, and 342.80 ms looking at the noses of Nobel laureates. In this sample, participants spent longer (on average) looking at the noses of Nobel winners than movie stars. But that's all you can say. You cannot generalize that conclusion to the population at large. 
+
+Yet, the whole point about doing an experiment is because we want to say something about how people behave *in general*. In the case of our eye-tracking experiments, we want to say something about how healthy college-age individuals view stimuli from different image categories. We collect data by grabbing a (hopefully) random sample of participants, and running them on the experiment. Our __population__ here is all healthy college-age individuals, and our __sample__ is the group of 40 or so participants that we've collected. 
+
+In order to generalize the findings from our __sample__ to the __population__ we need to think about __inferential statistics__.
+
+## Including Plots
+
