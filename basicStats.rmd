@@ -8,7 +8,7 @@ output:
   html_document:
     toc: true
 ---
-The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using RStudio, so if you haven't already download and install both R and RStudio.
+The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using [RStudio](https://www.rstudio.com/products/rstudio/download/), so if you haven't already download and install both [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
 
 # The Data
 In order to have some data to play with, there is a simulated datafile in `data/exampleData.tsv`
@@ -43,8 +43,11 @@ You can see all of our variables. Each subject has an IQ score and average noseD
 
 Notice that our table has one row per subject, and multiple *observations* for each subject in different columns. When the table is organized like this, it is referred to as *wide-format* 
 
+# Descriptive Statistics
+Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects are drawn from (you'll need **inferential statistics** for that...don't worry, it's coming). Descriptive statistics can be things like the *mean*, *mode*, and *median* of a variable. 
+
 ### Quick data summary
-Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects come (you'll need **inferential statistics** for that...don't worry, it's coming). Let's get some basic descriptive stats on this dataset.
+Let's get some basic descriptive stats on this dataset.
 
 ```{r}
 # if you need to install the psych library:
@@ -54,11 +57,26 @@ library(psych)  # this is an external library that has some really useful tools 
 describe(dt)
 ```
 
-You can see, for instance, that subjects spent an average of 249.81 ms looking at the noses of movie stars, and 342.80 ms looking at the noses of Nobel laureates. In this sample, participants spent longer (on average) looking at the noses of Nobel winners than movie stars. But that's all you can say. You cannot generalize that conclusion to the population at large. 
+You can see, for instance, that subjects spent an average of __249.81__ ms looking at the noses of movie stars, and __342.80__ ms looking at the noses of Nobel laureates. In this sample, participants spent longer (on average) looking at the noses of Nobel winners than movie stars. But that's all you can say. You cannot generalize that conclusion to the population at large. 
+
+### Plotting raw data
+It's often useful to plot your raw data to give you a better look at it. For one-dimensional data (e.g. subject IQ scores), a histogram can be a useful way to visualize your data
+```{r}
+# if you need to install the ggplot library:
+# install.packages("ggplot2", dependencies=TRUE)
+library(ggplot2)  # useful plotting library
+
+qplot(IQ, data=dt, 
+      binwidth=5,
+      main="Histogram for IQ",
+      col=I("white"))
+```
+
+This shows the number of particpants (y-axis) whose IQ was within a certain range (x-axis). Try plotting the distributions of other variables.
 
 Yet, the whole point about doing an experiment is because we want to say something about how people behave *in general*. In the case of our eye-tracking experiments, we want to say something about how healthy college-age individuals view stimuli from different image categories. We collect data by grabbing a (hopefully) random sample of participants, and running them on the experiment. Our __population__ here is all healthy college-age individuals, and our __sample__ is the group of 40 or so participants that we've collected. 
 
 In order to generalize the findings from our __sample__ to the __population__ we need to think about __inferential statistics__.
 
-## Including Plots
+# Inferential Statistics
 

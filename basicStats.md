@@ -4,10 +4,12 @@ jeff macinnes
 January 24, 2017
 
 -   [The Data](#the-data)
+-   [Descriptive Statistics](#descriptive-statistics)
     -   [Quick data summary](#quick-data-summary)
-    -   [Including Plots](#including-plots)
+    -   [Plotting raw data](#plotting-raw-data)
+-   [Inferential Statistics](#inferential-statistics)
 
-The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using RStudio, so if you haven't already download and install both R and RStudio.
+The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using [RStudio](https://www.rstudio.com/products/rstudio/download/), so if you haven't already download and install both [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
 
 The Data
 ========
@@ -51,9 +53,14 @@ You can see all of our variables. Each subject has an IQ score and average noseD
 
 Notice that our table has one row per subject, and multiple *observations* for each subject in different columns. When the table is organized like this, it is referred to as *wide-format*
 
+Descriptive Statistics
+======================
+
+Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects are drawn from (you'll need **inferential statistics** for that...don't worry, it's coming). Descriptive statistics can be things like the *mean*, *mode*, and *median* of a variable.
+
 ### Quick data summary
 
-Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects come (you'll need **inferential statistics** for that...don't worry, it's coming). Let's get some basic descriptive stats on this dataset.
+Let's get some basic descriptive stats on this dataset.
 
 ``` r
 # if you need to install the psych library:
@@ -74,11 +81,41 @@ describe(dt)
     ## noseAthlete  0.17    -0.18 3.84
     ## noseNobel   -0.07    -0.48 7.38
 
-You can see, for instance, that subjects spent an average of 249.81 ms looking at the noses of movie stars, and 342.80 ms looking at the noses of Nobel laureates. In this sample, participants spent longer (on average) looking at the noses of Nobel winners than movie stars. But that's all you can say. You cannot generalize that conclusion to the population at large.
+You can see, for instance, that subjects spent an average of **249.81** ms looking at the noses of movie stars, and **342.80** ms looking at the noses of Nobel laureates. In this sample, participants spent longer (on average) looking at the noses of Nobel winners than movie stars. But that's all you can say. You cannot generalize that conclusion to the population at large.
+
+### Plotting raw data
+
+It's often useful to plot your raw data to give you a better look at it. For one-dimensional data (e.g. subject IQ scores), a histogram can be a useful way to visualize your data
+
+``` r
+# if you need to install the ggplot library:
+# install.packages("ggplot2", dependencies=TRUE)
+library(ggplot2)  # useful plotting library
+```
+
+    ## Warning: package 'ggplot2' was built under R version 3.2.4
+
+    ## 
+    ## Attaching package: 'ggplot2'
+
+    ## The following objects are masked from 'package:psych':
+    ## 
+    ##     %+%, alpha
+
+``` r
+qplot(IQ, data=dt, 
+      binwidth=5,
+      main="Histogram for IQ",
+      col=I("white"))
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+This shows the number of particpants (y-axis) whose IQ was within a certain range (x-axis). Try plotting the distributions of other variables.
 
 Yet, the whole point about doing an experiment is because we want to say something about how people behave *in general*. In the case of our eye-tracking experiments, we want to say something about how healthy college-age individuals view stimuli from different image categories. We collect data by grabbing a (hopefully) random sample of participants, and running them on the experiment. Our **population** here is all healthy college-age individuals, and our **sample** is the group of 40 or so participants that we've collected.
 
 In order to generalize the findings from our **sample** to the **population** we need to think about **inferential statistics**.
 
-Including Plots
----------------
+Inferential Statistics
+======================
