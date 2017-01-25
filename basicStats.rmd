@@ -2,6 +2,8 @@
 title: "Basic Stats"
 author: "jeff macinnes"
 date: "January 24, 2017"
+header-includes:
+   - \usepackage{bbm}
 output: 
   github_document:
     toc: true
@@ -177,5 +179,84 @@ In that case, if we ran a t-test (covered below) and got a p-value of 0.04, this
 
 
 # Basic Analyses
+Here are some of the basic analyses that may be useful for your AVB eye-tracking analysis. For each, we'll describe an example use-case and how to format your data and run the analysis in R. 
 
+First off, think about what your goal is. Are you trying to:
 
++ Examine __relationships__ between variables: 
+    + 2 variables: [correlation](#correlation) 
+    + predict DV based on 2 or more variables: __multiple regression__
++ Compare __means__ between:
+    + one group vs. set value: __one-sample t-test__
+    + two groups, same subjects: __paired-samples t-test__
+    + two groups, different subjects: __independent samples t-test__
+    + >2 groups, one IV, same subjects: __repeated measures ANOVA__
+    + >2 groups, one IV, different subjecst: __one-way ANOVA__
+
+## Correlation
+Basic correlations are a measure of the relationship between two variables. A correlation will tell you the strength and direction of this relationship. A positive correlation means that as one variable increases, the other tends to increase as well; a negative correlation means that as one variable increases, the other variable tends to decrease. 
+
+For instance, in our sample dataset, say you were interested in knowing whether IQ scores predict fixation time on the noses of images of athletes. The two variables you'd select from the dataset are:
+  
+  + IQ
+  + noseAthlete
+  
+To run the correlation in R:
+```{r}
+
+# Compute the correlation coefficient, and determine if the relationship is significant
+cor.test(dt$IQ, y=dt$noseAthlete)
+```
+
+This provides you a lot of information. All the way at the bottom you have __cor__. This is the __correlation coeffcient__, __*r*__ and tells you the direction and the strength of the correlation. 
+
+  + 0 < __*r*__ < 1: positive correlation
+  + -1 < __*r*__ < 0: negative correlation
+  + |__*r*__| : strength of correlation
+  
+  
+So a __*r*__ of 0.66 represents a moderately strong *positive* correlation.
+
+__Is this correlation significant?__ Can we say that IQ significantly predicts fixation time on Athletes' noses?
+Our code also ran a hypothesis test behind the scenes. The hypotheses were:
+
+  + __H~o~__: true correlation between variables is 0
+  + __H~a~__: true correlation between variables is not 0
+  
+Find the p-value in the output table and interpret the result in the context of these hypotheses. 
+
+__Plotting the correlation:__
+
+It often helps to plot the correlation to get a visual sense of how two variables may be related to each other. Here's the R code to plot the two variables we correlated above:
+```{r}
+ggplot(dt, aes(x=IQ, y=noseAthlete)) +
+  geom_point(size=7, alpha=.5)
+```
+
+We can see that indeed there does seem to be a positive relationship between the variables. Subject's with lower IQ scores also spent less time fixating on the nose's of athletes. 
+
+__Fitting a regression line to your data__
+
+In the next section we'll talk about using __multiple regression__ to build a model to predict one variable based on a combination of 2+ seperate variables. This same idea can also be applied when you working with just 2 variables. You can use __linear regression__ to build a model that predicts one variable based on the value of a different variable. In our case, given this correlation we may be interested in building a model that predicts fixation time on athlete's nose based on IQ score.
+
+```{r}
+# code for running a basic linear model in R
+lmMod = lm(noseAthlete ~ IQ, data=dt)
+
+summary(lmMod)
+```
+
+This gives us a model for predicting noseAthlete based on IQ that takes the form 
+
+$${y=mx+b}$$
+
+where $y$ is noseAthlete, $x$ is IQ score, $m$ is the IQ coeffecient, and $b$ is the intercept. Furthermore, this output tells us that IQ is a __significant__ predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. 
+
+Let's add this line to the plot, along with the confidence intervals
+```{r}
+ggplot(dt, aes(x=IQ, y=noseAthlete)) +
+  geom_point(size=7, alpha=.5) +
+  geom_smooth(method=lm, color="red")
+```
+
+## Multiple Regression
