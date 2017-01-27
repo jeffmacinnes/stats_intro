@@ -158,7 +158,9 @@ Inferential statistics are used to *infer* aspects about a population based on t
 
 **So... are the IQ scores from our sample normally distributed or not?**
 
-Here's the plot again ![](basicStats_files/figure-markdown_github/unnamed-chunk-6-1.png)
+Here's the plot again
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 The Shapiro-Wilk normality test is a way of testing how liklely it is your observed data came from a normal distribution
 
@@ -340,10 +342,10 @@ This gives us a model for predicting noseAthlete based on IQ that takes the form
 where *y* is noseAthlete, *x* is IQ score, *m* is the IQ coeffecient, and *b* is the intercept. Furthermore, this output tells us that IQ is a **significant** predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. For example, if the new subject's IQ score was **116** we could predict the average amount of time they would spend fixating on the nose of athletes as:
 
 $$
-begin{align}
-y &= 1.032 \\cdot 116 + 200.3546
+\\begin{align}
+y &= 1.032 \\cdot 116 + 200.3546\\\\
 y &= {320.08}
-end{align}
+\\end{align}
 $$
 
 $$\\sum\_{i=1}^{n} X^3\_i$$
