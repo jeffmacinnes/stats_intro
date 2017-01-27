@@ -5,11 +5,13 @@ date: "January 24, 2017"
 header-includes:
    - \usepackage{bbm}
 output: 
-  github_document:
-    toc: true
   html_document:
     toc: true
+    mathjax: "default"
+  github_document:
+    toc: true
 ---
+
 The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using [RStudio](https://www.rstudio.com/products/rstudio/download/), so if you haven't already download and install both [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
 
 # The Data
@@ -29,7 +31,7 @@ And we measured __noseDwellTime__ across 3 different image categories. So, one i
     + __nobel__: faces of Nobel laureates
 
 
-So, lets's load the dataset:
+So, let's load the dataset:
 ```{r}
 # if you haven't already, set your working directory to 'stats_intro'
 #setwd("<dirPath>/stats_intro")
@@ -116,6 +118,7 @@ Inferential statistics are used to *infer* aspects about a population based on t
 __So... are the IQ scores from our sample normally distributed or not?__
 
 Here's the plot again
+
 ```{r echo=FALSE}
 qplot(IQ, data=dt, 
       binwidth=5,
@@ -137,7 +140,7 @@ With inferential statistics, the __true__ state of the world is unknown. You don
 If we're thinking about our normal distribution question above, we have two possibilities. Or let's call them *hypotheses*:
 
   + __hypothesis 1:__ the data __really are__ normally distributed
-  + __hypothesis 2:__ the data __really are *not*__ normally distributed
+  + __hypothesis 2:__ the data __really are *not* __ normally distributed
   
 You can either conclude that hypothesis 1 is correct, or conclude that hypothesis 2 is correct. So, there are 4 possible outcomes:
 
@@ -161,7 +164,7 @@ shapiro.test(dt$IQ)
 
 ```
 
-The Shapiro-Wilk normality test returned a p-value of __~.78__. That means there is a 78% chance we would see data that looks like our sample, assuming the null hypothesis __H~o~__ is true. Thus, we __fail to reject__ the null hypothesis that our data came from a normal distribution. 
+The Shapiro-Wilk normality test returned a p-value of __~.78__. That means there is a 78% chance we would see data that looks like our sample, assuming the null hypothesis __H~o~__ is true. __.78__ > __.05__, thus we __fail to reject__ the null hypothesis that our data came from a normal distribution. 
 
 __NOTE:__ this is __not__ the same as saying "therefore our data came from a normal distribution." All hypothesis testing of this sort allows us to say is "based upon the strength of our evidence, we cannot reasonably rule out the possibility that our data came from a normal distribution."
 
@@ -235,9 +238,9 @@ ggplot(dt, aes(x=IQ, y=noseAthlete)) +
 
 We can see that indeed there does seem to be a positive relationship between the variables. Subject's with lower IQ scores also spent less time fixating on the nose's of athletes. 
 
-__Fitting a regression line to your data__
+__Using one variable to predict the other__
 
-In the next section we'll talk about using __multiple regression__ to build a model to predict one variable based on a combination of 2+ seperate variables. This same idea can also be applied when you working with just 2 variables. You can use __linear regression__ to build a model that predicts one variable based on the value of a different variable. In our case, given this correlation we may be interested in building a model that predicts fixation time on athlete's nose based on IQ score.
+In the next section we'll talk about using __multiple regression__ to build a model to predict one variable based on a combination of 2+ seperate variables. This same idea can also be applied when you're working with just 2 variables. You can use __linear regression__ to build a model that predicts one variable based on the value of a different variable. In our case, given this correlation we may be interested in building a model that predicts fixation time on athlete's nose based on IQ score.
 
 ```{r}
 # code for running a basic linear model in R
@@ -250,7 +253,21 @@ This gives us a model for predicting noseAthlete based on IQ that takes the form
 
 $${y=mx+b}$$
 
-where $y$ is noseAthlete, $x$ is IQ score, $m$ is the IQ coeffecient, and $b$ is the intercept. Furthermore, this output tells us that IQ is a __significant__ predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. 
+where $y$ is noseAthlete, $x$ is IQ score, $m$ is the IQ coeffecient, and $b$ is the intercept. Furthermore, this output tells us that IQ is a __significant__ predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. For example, if the new subject's IQ score was __116__ we could predict the average amount of time they would spend fixating on the nose of athletes as:
+
+$$
+\begin{align}
+y &= 1.032 \cdot 116 + 200.3546\\
+y &= {320.08}
+\end{align}
+$$
+
+
+$$\sum_{i=1}^{n} X^3_i$$
+
+This is just \textit{n} practice
+We'd predict noseAthlete to be ~320ms. Looking at the plot above, does this prediction seem reasonable?
+
 
 Let's add this line to the plot, along with the confidence intervals
 ```{r}

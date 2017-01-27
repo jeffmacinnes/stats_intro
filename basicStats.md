@@ -37,7 +37,7 @@ And we measured **noseDwellTime** across 3 different image categories. So, one i
     -   **athlete**: faces of athletes
     -   **nobel**: faces of Nobel laureates
 
-So, lets's load the dataset:
+So, let's load the dataset:
 
 ``` r
 # if you haven't already, set your working directory to 'stats_intro'
@@ -181,7 +181,7 @@ With inferential statistics, the **true** state of the world is unknown. You don
 If we're thinking about our normal distribution question above, we have two possibilities. Or let's call them *hypotheses*:
 
 -   **hypothesis 1:** the data **really are** normally distributed
--   **hypothesis 2:** the data **really are *not*** normally distributed
+-   **hypothesis 2:** the data **really are *not* ** normally distributed
 
 You can either conclude that hypothesis 1 is correct, or conclude that hypothesis 2 is correct. So, there are 4 possible outcomes:
 
@@ -211,7 +211,7 @@ shapiro.test(dt$IQ)
     ## data:  dt$IQ
     ## W = 0.98255, p-value = 0.7827
 
-The Shapiro-Wilk normality test returned a p-value of **~.78**. That means there is a 78% chance we would see data that looks like our sample, assuming the null hypothesis **H<sub>o</sub>** is true. Thus, we **fail to reject** the null hypothesis that our data came from a normal distribution.
+The Shapiro-Wilk normality test returned a p-value of **~.78**. That means there is a 78% chance we would see data that looks like our sample, assuming the null hypothesis **H<sub>o</sub>** is true. **.78** &gt; **.05**, thus we **fail to reject** the null hypothesis that our data came from a normal distribution.
 
 **NOTE:** this is **not** the same as saying "therefore our data came from a normal distribution." All hypothesis testing of this sort allows us to say is "based upon the strength of our evidence, we cannot reasonably rule out the possibility that our data came from a normal distribution."
 
@@ -303,9 +303,9 @@ ggplot(dt, aes(x=IQ, y=noseAthlete)) +
 
 We can see that indeed there does seem to be a positive relationship between the variables. Subject's with lower IQ scores also spent less time fixating on the nose's of athletes.
 
-**Fitting a regression line to your data**
+**Using one variable to predict the other**
 
-In the next section we'll talk about using **multiple regression** to build a model to predict one variable based on a combination of 2+ seperate variables. This same idea can also be applied when you working with just 2 variables. You can use **linear regression** to build a model that predicts one variable based on the value of a different variable. In our case, given this correlation we may be interested in building a model that predicts fixation time on athlete's nose based on IQ score.
+In the next section we'll talk about using **multiple regression** to build a model to predict one variable based on a combination of 2+ seperate variables. This same idea can also be applied when you're working with just 2 variables. You can use **linear regression** to build a model that predicts one variable based on the value of a different variable. In our case, given this correlation we may be interested in building a model that predicts fixation time on athlete's nose based on IQ score.
 
 ``` r
 # code for running a basic linear model in R
@@ -337,7 +337,18 @@ This gives us a model for predicting noseAthlete based on IQ that takes the form
 
 *y* = *m**x* + *b*
 
-where *y* is noseAthlete, *x* is IQ score, *m* is the IQ coeffecient, and *b* is the intercept. Furthermore, this output tells us that IQ is a **significant** predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score.
+where *y* is noseAthlete, *x* is IQ score, *m* is the IQ coeffecient, and *b* is the intercept. Furthermore, this output tells us that IQ is a **significant** predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. For example, if the new subject's IQ score was **116** we could predict the average amount of time they would spend fixating on the nose of athletes as:
+
+$$
+begin{align}
+y &= 1.032 \\cdot 116 + 200.3546
+y &= {320.08}
+end{align}
+$$
+
+$$\\sum\_{i=1}^{n} X^3\_i$$
+
+This is just practice We'd predict noseAthlete to be ~320ms. Looking at the plot above, does this prediction seem reasonable?
 
 Let's add this line to the plot, along with the confidence intervals
 
