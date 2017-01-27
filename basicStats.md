@@ -14,8 +14,13 @@ January 24, 2017
     -   [Hypothesis testing](#hypothesis-testing)
     -   [Interpreting results](#interpreting-results)
 -   [Basic Analyses](#basic-analyses)
-    -   [Correlation](#correlation)
-    -   [Multiple Regression](#multiple-regression)
+    -   [Examine relationships](#examine-relationships)
+        -   [Correlation](#correlation)
+        -   [Multiple Regression](#multiple-regression)
+    -   [Compare Means](#compare-means)
+        -   [One-sample t-test](#one-sample-t-test)
+        -   [Paired-samples t-test](#paired-samples-t-test)
+        -   [Independent Samples t-test](#independent-samples-t-test)
 
 The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using [RStudio](https://www.rstudio.com/products/rstudio/download/), so if you haven't already download and install both [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
 
@@ -239,17 +244,21 @@ First off, think about what your goal is. Are you trying to:
 
 -   Examine **relationships** between variables:
     -   2 variables: [correlation](#correlation)
-    -   predict DV based on 2 or more variables: **multiple regression**
+    -   predict DV based on 2 or more variables: [multiple regression](#multiple-regression)
 -   Compare **means** between:
-    -   one group vs. set value: **one-sample t-test**
-    -   two groups, same subjects: **paired-samples t-test**
-    -   two groups, different subjects: **independent samples t-test**
+    -   one group vs. set value: [one-sample t-test](#one-sample-t-test)
+    -   two groups, same subjects:[paired-samples t-test](#paired-samples-t-test)
+    -   two groups, different subjects: [independent samples t-test](#independent-samples-t-test)
     -   2 groups, one IV, same subjects: **repeated measures ANOVA**
 
     -   2 groups, one IV, different subjecst: **one-way ANOVA**
 
-Correlation
------------
+Examine relationships
+---------------------
+
+------------------------------------------------------------------------
+
+### Correlation
 
 Basic correlations are a measure of the relationship between two variables. A correlation will tell you the strength and direction of this relationship. A positive correlation means that as one variable increases, the other tends to increase as well; a negative correlation means that as one variable increases, the other variable tends to decrease.
 
@@ -337,20 +346,15 @@ summary(lmMod)
 
 This gives us a model for predicting noseAthlete based on IQ that takes the form
 
-*y* = *m**x* + *b*
+***y = mx + b***
 
 where *y* is noseAthlete, *x* is IQ score, *m* is the IQ coeffecient, and *b* is the intercept. Furthermore, this output tells us that IQ is a **significant** predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. For example, if the new subject's IQ score was **116** we could predict the average amount of time they would spend fixating on the nose of athletes as:
 
-$$
-\\begin{align}
-y &= 1.032 \\cdot 116 + 200.3546\\\\
-y &= {320.08}
-\\end{align}
-$$
+***y = (1.032)116 + 200.35***
 
-$$\\sum\_{i=1}^{n} X^3\_i$$
+***y = 320.08***
 
-This is just practice We'd predict noseAthlete to be ~320ms. Looking at the plot above, does this prediction seem reasonable?
+We'd predict noseAthlete to be **~320ms**. Looking at the plot above, does this prediction seem reasonable?
 
 Let's add this line to the plot, along with the confidence intervals
 
@@ -362,5 +366,189 @@ ggplot(dt, aes(x=IQ, y=noseAthlete)) +
 
 ![](basicStats_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
-Multiple Regression
--------------------
+### Multiple Regression
+
+**Multiple regression** is using 2 or more variables to predict a DV. For instance, if you wanted to predict IQ scores based on height and age, you'd use multiple regression. The formula follows the same pattern as the simple linear regression above, only with more variables. In this example, our formula would look like:
+
+***IQ = w<sub>1</sub>age + w<sub>2</sub>height + b***
+
+Here, **w<sub>1</sub>** and **w<sub>2</sub>** represent the coeffecients (or *weights*) assigned to each of the variables in our model. Running multiple regression will tell us whether this *model* significantly predicts IQ or not.
+
+Let's build a mulitple regression model consisting of nose fixation time on Move stars, Athletes, and Nobel Laureats, to see if we can predict IQ scores. So, our:
+
+-   **DV**: IQ score
+-   **IVs** (aka **Predictors**) :
+    -   noseMovie
+    -   noseAthlete
+    -   noseNobel
+
+``` r
+# code for running a basic multiple regression model in R
+lmMod = lm(IQ ~ noseMovie + noseAthlete + noseNobel, data=dt)
+
+summary(lmMod)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = IQ ~ noseMovie + noseAthlete + noseNobel, data = dt)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -30.1562  -7.1567  -0.6498   6.1701  23.9745 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) -65.408100  32.406834  -2.018   0.0511 .  
+    ## noseMovie     0.110217   0.071655   1.538   0.1328    
+    ## noseAthlete   0.438242   0.077753   5.636 2.13e-06 ***
+    ## noseNobel     0.006048   0.040736   0.148   0.8828    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 11.78 on 36 degrees of freedom
+    ## Multiple R-squared:  0.481,  Adjusted R-squared:  0.4378 
+    ## F-statistic: 11.12 on 3 and 36 DF,  p-value: 2.596e-05
+
+The **p-value** all the way down at the bottom is less than **0.05**, which tells us that *overall* our model (including all 3 variables) is significant.
+
+However, we might want to know which variables are contributing the most to our model's prediction accuracy. You can find this information by looking at the coefficents table. We see that out of all 3 variables, only **noseAthlete** is a significant predictor in our model. This shouldn't be surprising, as we demonstrated that noseAthlete and IQ score were significantly correlated in our discussion of [correlations](#correlation) above.
+
+Compare Means
+-------------
+
+------------------------------------------------------------------------
+
+### One-sample t-test
+
+A **one-sample t-test** can be used to test whether the mean of *a single variable* is significantly different from a set value.
+
+For instance, IQ tests are normalized so that the average score for a population should be 100. Let's use a one-sample t-test to test whether our sample of IQ scores is significantly different from the mean.
+
+``` r
+# code for one-sample t-test
+t.test(dt$IQ, mu=100)
+```
+
+    ## 
+    ##  One Sample t-test
+    ## 
+    ## data:  dt$IQ
+    ## t = -2.0336, df = 39, p-value = 0.04883
+    ## alternative hypothesis: true mean is not equal to 100
+    ## 95 percent confidence interval:
+    ##  89.92712 99.97288
+    ## sample estimates:
+    ## mean of x 
+    ##     94.95
+
+Whoa, interesting. Remember, we are testing against the null hypothesis, which in this case is **true mean of the population is 100**. Our **p-value** is less than 0.05 (albeit slightly), so we are justified in **rejecting the null hypothesis**.
+
+And indeed, if we plot the distribution of our data, you can see that the sample mean (red) is a bit lower than the population mean (green)
+
+``` r
+# plot the histogram for IQ scores
+ggplot(dt, aes(x=IQ)) + 
+  geom_histogram(binwidth=5, size=.2, col="white") + 
+  geom_vline(xintercept=mean(dt$IQ), color="red") +
+  geom_vline(xintercept=100, color="green") +
+  ggtitle("Histogram for IQ (40 samples)")
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+### Paired-samples t-test
+
+Instead of comparing the mean against a fixed number, say you wanted compare the means of **two** variables to see if they are significantly different from each other. A t-test is perfect for this, but how you set it up depends critically on how each variable was collected. Are the same subjects represented in each variable? If so, use a **paired t-test**. Are the variables collected from different subjects? Use an **independent sample t-test** (next section).
+
+The reason this is important is because your analysis needs to be different if the *variables are **not** independent from one another*. Imagine we wanted to know if the amount of time spent fixating on the nose was different between images of athletes vs. Nobel laureates. We designed a study where we showed each participant images of athletes and images of Nobel laureates, and recorded the time spent fixating on the note. Say one of our participants really likes noses, and stares at the nose for the entire trial, regardless of whether it's an athlete or a Nobel laurete. This illustrates how a characteristic of a subject can exert an influence on ***both*** measures. Because of this, the two variables are not *independent* of one another.
+
+Here's the code to run this paired-samples t-test in r:
+
+``` r
+# paired samples t-test
+t.test(dt$noseAthlete, dt$noseNobel, paired=TRUE)
+```
+
+    ## 
+    ##  Paired t-test
+    ## 
+    ## data:  dt$noseAthlete and dt$noseNobel
+    ## t = -5.2728, df = 39, p-value = 5.278e-06
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -61.49314 -27.39486
+    ## sample estimates:
+    ## mean of the differences 
+    ##                 -44.444
+
+The **p-value** indicates we have a significant difference between the conditions.
+
+Let's plot the means of each condition to visualize this result more clearly
+
+``` r
+# we first need to convert these variables in the table from wide to long format (more on this under ANOVAs)
+library(reshape2)
+dt$ID <- 1:nrow(dt)    # create ID col
+dt_long <- melt(dt, id.vars="ID", measure.vars = c("noseAthlete", "noseNobel"), variable.name="imageType")
+
+# make box plot of the two measures
+ggplot(dt_long, aes(x=imageType, y=value)) +
+  geom_boxplot(fill="#A4A4A4") +
+  ylim(0, 500)
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+**NOTE:**: For this example we chose 2 of the image categories in our dataset, but our dataset really has 3 levels of IV; it includes movie star images as well. If this were a real-life example, the more proper thing to do would be to compare the means across all 3 images categories (**ANOVAs**, described later). Deliberately leaving a group out of your analyses is only ever justified if you have strong *a priori* hypotheses about your results.
+
+### Independent Samples t-test
+
+An **independent samples t-test** allows you to compare the means of two *independent variables*, meaning they did not come from the same individuals.
+
+Since our example dataset has multiple measures collected from the same subjects, we can't run an independent samples t-test on it. Instead, let's make up some other fake data quick. Let's pretend we measured the heights of 200 people from Durham, and 200 people in Chapel Hill
+
+``` r
+# set random number seed for later reproducibility
+set.seed(500)
+
+# generate sample data from normal distributions
+durhamHeights = rnorm(200, mean=68, sd=5)
+durm = rep("durm", 200)
+chapHeights = rnorm(200, mean=66.8, sd=6)
+ch = rep("ch", 200)
+
+# make dataframe
+city <- c(durm, ch)
+heights <- c(durhamHeights, chapHeights)
+height_dt <- data.frame(city, heights)
+
+# plot the two distibutions
+ggplot(height_dt, aes(x=heights, fill=city)) +
+  geom_density(alpha=0.3) +
+  xlim(40, 90) +
+  ggtitle("Distribution of heights")
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+The two distributions looks pretty similar, with mean for Durham being maybe slighty taller. Let's run some stats on this to see if there is a significant difference.
+
+``` r
+# independent samples t-test
+t.test(durhamHeights, chapHeights, paired=FALSE)
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  durhamHeights and chapHeights
+    ## t = 1.7258, df = 395.54, p-value = 0.08516
+    ## alternative hypothesis: true difference in means is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -0.1316855  2.0242062
+    ## sample estimates:
+    ## mean of x mean of y 
+    ##  67.58886  66.64259
+
+Our **p-value** is above our threshold of 0.05, thus we **fail to reject the null hypothesis**, meaning we don't have sufficient evidence to rule out the possibility that the heights are the same in both cities.

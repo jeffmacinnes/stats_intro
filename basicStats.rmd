@@ -185,15 +185,19 @@ First off, think about what your goal is. Are you trying to:
 
 + Examine __relationships__ between variables: 
     + 2 variables: [correlation](#correlation) 
-    + predict DV based on 2 or more variables: __multiple regression__
+    + predict DV based on 2 or more variables: [multiple regression](#multiple-regression)
 + Compare __means__ between:
-    + one group vs. set value: __one-sample t-test__
-    + two groups, same subjects: __paired-samples t-test__
-    + two groups, different subjects: __independent samples t-test__
+    + one group vs. set value: [one-sample t-test](#one-sample-t-test)
+    + two groups, same subjects:[paired-samples t-test](#paired-samples-t-test)
+    + two groups, different subjects: [independent samples t-test](#independent-samples-t-test)
     + >2 groups, one IV, same subjects: __repeated measures ANOVA__
     + >2 groups, one IV, different subjecst: __one-way ANOVA__
 
-## Correlation
+##Examine relationships
+
+***
+
+### Correlation
 Basic correlations are a measure of the relationship between two variables. A correlation will tell you the strength and direction of this relationship. A positive correlation means that as one variable increases, the other tends to increase as well; a negative correlation means that as one variable increases, the other variable tends to decrease. 
 
 For instance, in our sample dataset, say you were interested in knowing whether IQ scores predict fixation time on the noses of images of athletes. The two variables you'd select from the dataset are:
@@ -248,22 +252,15 @@ summary(lmMod)
 
 This gives us a model for predicting noseAthlete based on IQ that takes the form 
 
-$${y=mx+b}$$
+__*y = mx + b*__
 
 where $y$ is noseAthlete, $x$ is IQ score, $m$ is the IQ coeffecient, and $b$ is the intercept. Furthermore, this output tells us that IQ is a __significant__ predictor of noseAthlete (find the associated p-value in the output table). Using this formula, we can predict the fixation time on athletes' nose for a *new* subject if we know his/her IQ score. For example, if the new subject's IQ score was __116__ we could predict the average amount of time they would spend fixating on the nose of athletes as:
 
-$$
-\begin{align}
-y &= 1.032 \cdot 116 + 200.3546\\
-y &= {320.08}
-\end{align}
-$$
+__*y = (1.032)116 + 200.35*__
 
+__*y = 320.08*__
 
-$$\sum_{i=1}^{n} X^3_i$$
-
-This is just \textit{n} practice
-We'd predict noseAthlete to be ~320ms. Looking at the plot above, does this prediction seem reasonable?
+We'd predict noseAthlete to be __~320ms__. Looking at the plot above, does this prediction seem reasonable?
 
 
 Let's add this line to the plot, along with the confidence intervals
@@ -273,4 +270,123 @@ ggplot(dt, aes(x=IQ, y=noseAthlete)) +
   geom_smooth(method=lm, color="red")
 ```
 
-## Multiple Regression
+### Multiple Regression
+__Multiple regression__ is using 2 or more variables to predict a DV. For instance, if you wanted to predict IQ scores based on height and age, you'd use multiple regression. The formula follows the same pattern as the simple linear regression above, only with more variables. In this example, our formula would look like:
+
+__*IQ = w~1~age + w~2~height + b*__
+
+Here, __w~1~__ and __w~2~__ represent the coeffecients (or *weights*) assigned to each of the variables in our model. Running multiple regression will tell us whether this *model* significantly predicts IQ or not. 
+
+Let's build a mulitple regression model consisting of nose fixation time on Move stars, Athletes, and Nobel Laureats, to see if we can predict IQ scores. So, our:
+    
+  + __DV__: IQ score
+  + __IVs__ (aka __Predictors__) :
+    + noseMovie
+    + noseAthlete
+    + noseNobel
+
+
+```{r}
+# code for running a basic multiple regression model in R
+lmMod = lm(IQ ~ noseMovie + noseAthlete + noseNobel, data=dt)
+
+summary(lmMod)
+```
+
+The __p-value__ all the way down at the bottom is less than __0.05__, which tells us that *overall* our model (including all 3 variables) is significant. 
+
+However, we might want to know which variables are contributing the most to our model's prediction accuracy. You can find this information by looking at the coefficents table. We see that out of all 3 variables, only __noseAthlete__ is a significant predictor in our model. This shouldn't be surprising, as we demonstrated that noseAthlete and IQ score were significantly correlated in our discussion of [correlations](#correlation) above. 
+
+## Compare Means 
+
+***
+
+### One-sample t-test
+A __one-sample t-test__ can be used to test whether the mean of *a single variable* is significantly different from a set value. 
+
+For instance, IQ tests are normalized so that the average score for a population should be 100. Let's use a one-sample t-test to test whether our sample of IQ scores is significantly different from the mean.  
+
+```{r}
+# code for one-sample t-test
+t.test(dt$IQ, mu=100)
+
+```
+Whoa, interesting. Remember, we are testing against the null hypothesis, which in this case is __true mean of the population is 100__. Our __p-value__ is less than 0.05 (albeit slightly), so we are justified in __rejecting the null hypothesis__.  
+
+And indeed, if we plot the distribution of our data, you can see that the sample mean (red) is a bit lower than the population mean (green)
+```{r}
+# plot the histogram for IQ scores
+ggplot(dt, aes(x=IQ)) + 
+  geom_histogram(binwidth=5, size=.2, col="white") + 
+  geom_vline(xintercept=mean(dt$IQ), color="red") +
+  geom_vline(xintercept=100, color="green") +
+  ggtitle("Histogram for IQ (40 samples)")
+```
+
+
+### Paired-samples t-test
+
+Instead of comparing the mean against a fixed number, say you wanted compare the means of __two__ variables to see if they are significantly different from each other. A t-test is perfect for this, but how you set it up depends critically on how each variable was collected. Are the same subjects represented in each variable? If so, use a __paired t-test__. Are the variables collected from different subjects? Use an __independent sample t-test__ (next section). 
+
+The reason this is important is because your analysis needs to be different if the *variables are __not__ independent from one another*. Imagine we wanted to know if the amount of time spent fixating on the nose was different between images of athletes vs. Nobel laureates. We designed a study where we showed each participant images of athletes and images of Nobel laureates, and recorded the time spent fixating on the note. Say one of our participants really likes noses, and stares at the nose for the entire trial, regardless of whether it's an athlete or a Nobel laurete. This illustrates how a characteristic of a subject can exert an influence on __*both*__ measures. Because of this, the two variables are not *independent* of one another.
+
+Here's the code to run this paired-samples t-test in r:
+```{r}
+# paired samples t-test
+t.test(dt$noseAthlete, dt$noseNobel, paired=TRUE)
+```
+
+The __p-value__ indicates we have a significant difference between the conditions. 
+
+Let's plot the means of each condition to visualize this result more clearly
+
+```{r}
+# we first need to convert these variables in the table from wide to long format (more on this under ANOVAs)
+library(reshape2)
+dt$ID <- 1:nrow(dt)    # create ID col
+dt_long <- melt(dt, id.vars="ID", measure.vars = c("noseAthlete", "noseNobel"), variable.name="imageType")
+
+# make box plot of the two measures
+ggplot(dt_long, aes(x=imageType, y=value)) +
+  geom_boxplot(fill="#A4A4A4") +
+  ylim(0, 500)
+
+```
+
+__NOTE:__: For this example we chose 2 of the image categories in our dataset, but our dataset really has 3 levels of IV; it includes movie star images as well. If this were a real-life example, the more proper thing to do would be to compare the means across all 3 images categories (__ANOVAs__, described later). Deliberately leaving a group out of your analyses is only ever justified if you have strong *a priori* hypotheses about your results. 
+
+### Independent Samples t-test
+An __independent samples t-test__ allows you to compare the means of two *independent variables*, meaning they did not come from the same individuals. 
+
+Since our example dataset has multiple measures collected from the same subjects, we can't run an independent samples t-test on it. Instead, let's make up some other fake data quick. Let's pretend we measured the heights of 200 people from Durham, and 200 people in Chapel Hill
+```{r}
+# set random number seed for later reproducibility
+set.seed(500)
+
+# generate sample data from normal distributions
+durhamHeights = rnorm(200, mean=68, sd=5)
+durm = rep("durm", 200)
+chapHeights = rnorm(200, mean=66.8, sd=6)
+ch = rep("ch", 200)
+
+# make dataframe
+city <- c(durm, ch)
+heights <- c(durhamHeights, chapHeights)
+height_dt <- data.frame(city, heights)
+
+# plot the two distibutions
+ggplot(height_dt, aes(x=heights, fill=city)) +
+  geom_density(alpha=0.3) +
+  xlim(40, 90) +
+  ggtitle("Distribution of heights")
+
+```
+
+The two distributions looks pretty similar, with mean for Durham being maybe slighty taller. Let's run some stats on this to see if there is a significant difference. 
+
+```{r}
+# independent samples t-test
+t.test(durhamHeights, chapHeights, paired=FALSE)
+```
+
+Our __p-value__ is above our threshold of 0.05, thus we __fail to reject the null hypothesis__, meaning we don't have sufficient evidence to rule out the possibility that the heights are the same in both cities. 
