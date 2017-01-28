@@ -258,8 +258,8 @@ First off, think about what your goal is. Are you trying to:
     -   one group vs. set value: [one-sample t-test](#one-sample-t-test)
     -   two groups, same subjects: [paired-samples t-test](#paired-samples-t-test)
     -   two groups, different subjects: [independent samples t-test](#independent-samples-t-test)
-    -   2+ groups, one IV, same subjects: [repeated measures ANOVA](#repeated-measures-ANOVA)\_\_
-    -   2+ groups, one IV, different subjecst: **one-way ANOVA**
+    -   3+ groups, one IV, same subjects: [repeated measures ANOVA](#repeated-measures-ANOVA)
+    -   3+ groups, one IV, different subjecst: [one-way ANOVA](#one-way-ANOVA)
 
 Examine relationships
 ---------------------

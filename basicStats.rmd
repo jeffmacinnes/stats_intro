@@ -136,7 +136,7 @@ With inferential statistics, the __true__ state of the world is unknown. You don
 If we're thinking about our normal distribution question above, we have two possibilities. Or let's call them *hypotheses*:
 
   + __hypothesis 1:__ the data __really are__ normally distributed
-  + __hypothesis 2:__ the data __really are *not* __ normally distributed
+  + __hypothesis 2:__ the data __really are not__ normally distributed
   
 You can either conclude that hypothesis 1 is correct, or conclude that hypothesis 2 is correct. So, there are 4 possible outcomes:
 
@@ -197,8 +197,8 @@ First off, think about what your goal is. Are you trying to:
     + one group vs. set value: [one-sample t-test](#one-sample-t-test)
     + two groups, same subjects: [paired-samples t-test](#paired-samples-t-test)
     + two groups, different subjects: [independent samples t-test](#independent-samples-t-test)
-    + 2+ groups, one IV, same subjects: [repeated measures ANOVA](#repeated-measures-ANOVA)__
-    + 2+ groups, one IV, different subjecst: __one-way ANOVA__
+    + 3+ groups, one IV, same subjects: [repeated measures ANOVA](#repeated-measures-ANOVA)
+    + 3+ groups, one IV, different subjecst: [one-way ANOVA](#one-way-ANOVA)
 
 ##Examine relationships
 
