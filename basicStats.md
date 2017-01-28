@@ -1,7 +1,6 @@
 Basic Stats
 ================
-jeff macinnes
-January 24, 2017
+January 27, 2017
 
 
 
@@ -21,6 +20,8 @@ January 24, 2017
         -   [One-sample t-test](#one-sample-t-test)
         -   [Paired-samples t-test](#paired-samples-t-test)
         -   [Independent Samples t-test](#independent-samples-t-test)
+        -   [Repeated measures ANOVA](#repeated-measures-anova)
+        -   [One-way ANOVA](#one-way-anova)
 
 The goal here is to provide an overview on some basic statistical approaches that you can use in analyzing your AVB eye-tracking data. We'll cover the ideas behind these approaches -- identifying dependent/independent variables, deciding on appropriate analyses, interpretting results -- as well as the tools to run these analyses yourself. We'll be using [RStudio](https://www.rstudio.com/products/rstudio/download/), so if you haven't already download and install both [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/products/rstudio/download/).
 
@@ -80,7 +81,7 @@ dt$IQ
 Descriptive Statistics
 ======================
 
-Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects are drawn from (you'll need **inferential statistics** for that...don't worry, it's coming). Descriptive statistics can be things like the *mean*, *mode*, and *median* of a variable.
+Descriptive statistics are ways to summarize *your data*. That is, they don't infer any conclusions from your data to the larger population from which your subjects are drawn from (you'll need **inferential statistics** for that...coming later). Descriptive statistics can be things like the *mean*, *mode*, and *median* of a variable.
 
 ### Quick data summary
 
@@ -204,7 +205,15 @@ To set up a hypothesis test, we define one of our hypothesis as the **null** hyp
 
 So our null hypothesis is that our data indeed came from a normally distributed population. Remember, we don't have any way of knowing if this is **actually** true or not. Instead, we say "assuming the data **DID** come from a normally distributed population, how probable is it that we would have gotten our observed data through random sampling?" This probability is reflected in the **p-value**.
 
-When we run a hypothesis test we are asking whether we are going to **reject** or **fail to reject** the null hypothesis based on the strength of the p-value. So we also need to set up a p-value threshold that will allow us to make that decision. This is often set at p &lt; 0.05; or, in other words, we are willing to **reject** the null hypothesis if, assuming the null hypothesis **is** true, there's less than a 5% chance we would have observed our results in a random sample.
+When we run a hypothesis test we are asking whether we are going to **reject** or **fail to reject** the null hypothesis based on the strength of the p-value. So we also need to set up a p-value threshold that will allow us to make that decision.
+
+Our threshold (also sometimes called ***alpha***, or *α*) can be whatever we set it as. However, by convention you'll often see the following thresolds used to define a result as "significant" or "not":
+
+-   ***p*** ≤ **0.05**
+-   ***p*** ≤ **0.01**
+-   ***p*** ≤ **0.001**
+
+When we run a statistical test and get a **p-value** we can compare it against our **alpha** and determine whether our result reached "significance" or not. For example, if our **alpha** was set at 0.05, we would be willing to **reject** the null hypothesis if, assuming the null hypothesis **is** true, there's less than a 5% chance we would have observed our results in a random sample.
 
 So let's return to the Shapiro-Wilk normality test on our IQ sample
 
@@ -233,7 +242,7 @@ The Shapiro-Wilk example was chosen to illustrate these ideas because, unlike ot
 -   **H<sub>o</sub>**: There is no difference in average height between Durham and Chapel Hill
 -   **H<sub>A</sub>**: There is a difference in average height between Durham and Chapel Hill
 
-In that case, if we ran a t-test (covered below) and got a p-value of 0.04, this would mean: assuming there was **no difference** in the average height, there would be a 4% chance we would have observed a difference of 7cm. Since this is below our p-threshold of 5%, we would be justified in **rejecting the null hypothesis**. And again, this does not mean that a true difference exists. Just that you failed to find compelling evidence that a difference **didn't** exist. *Not Guilty* does not mean *Innocent*.
+In that case, if we ran a t-test (covered below) and got a p-value of 0.04, this would mean: assuming there was **no difference** in the average height, there would only be a 4% chance we would have observed a difference of 7cm by random sampling. Since this is below our p-threshold of 5%, we would be justified in **rejecting the null hypothesis**. And again, this does not mean that a true difference exists. Just that you failed to find compelling evidence that a difference **didn't** exist. *Not Guilty* does not mean *Innocent*.
 
 Basic Analyses
 ==============
@@ -247,11 +256,10 @@ First off, think about what your goal is. Are you trying to:
     -   predict DV based on 2 or more variables: [multiple regression](#multiple-regression)
 -   Compare **means** between:
     -   one group vs. set value: [one-sample t-test](#one-sample-t-test)
-    -   two groups, same subjects:[paired-samples t-test](#paired-samples-t-test)
+    -   two groups, same subjects: [paired-samples t-test](#paired-samples-t-test)
     -   two groups, different subjects: [independent samples t-test](#independent-samples-t-test)
-    -   2 groups, one IV, same subjects: **repeated measures ANOVA**
-
-    -   2 groups, one IV, different subjecst: **one-way ANOVA**
+    -   2+ groups, one IV, same subjects: [repeated measures ANOVA](#repeated-measures-ANOVA)\_\_
+    -   2+ groups, one IV, different subjecst: **one-way ANOVA**
 
 Examine relationships
 ---------------------
@@ -461,7 +469,7 @@ ggplot(dt, aes(x=IQ)) +
 
 Instead of comparing the mean against a fixed number, say you wanted compare the means of **two** variables to see if they are significantly different from each other. A t-test is perfect for this, but how you set it up depends critically on how each variable was collected. Are the same subjects represented in each variable? If so, use a **paired t-test**. Are the variables collected from different subjects? Use an **independent sample t-test** (next section).
 
-The reason this is important is because your analysis needs to be different if the *variables are **not** independent from one another*. Imagine we wanted to know if the amount of time spent fixating on the nose was different between images of athletes vs. Nobel laureates. We designed a study where we showed each participant images of athletes and images of Nobel laureates, and recorded the time spent fixating on the note. Say one of our participants really likes noses, and stares at the nose for the entire trial, regardless of whether it's an athlete or a Nobel laurete. This illustrates how a characteristic of a subject can exert an influence on ***both*** measures. Because of this, the two variables are not *independent* of one another.
+The reason this is important is because your analysis needs to be different if the variables are **not** independent from one another. Imagine we wanted to know if the amount of time spent fixating on the nose was different between images of athletes vs. Nobel laureates. We designed a study where we showed each participant images of athletes and images of Nobel laureates, and recorded the time spent fixating on the note. Say one of our participants really likes noses, and stares at the nose for the entire trial, regardless of whether it's an athlete or a Nobel laurete. This illustrates how a characteristic of a subject can exert an influence on ***both*** measures. Because of this, the two variables are not *independent* of one another.
 
 Here's the code to run this paired-samples t-test in r:
 
@@ -532,7 +540,7 @@ ggplot(height_dt, aes(x=heights, fill=city)) +
 
 ![](basicStats_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-The two distributions looks pretty similar, with mean for Durham being maybe slighty taller. Let's run some stats on this to see if there is a significant difference.
+The two distributions looks pretty similar, with the mean height for Durham being maybe slighty taller. Let's run some stats on this to see if there is a significant difference.
 
 ``` r
 # independent samples t-test
@@ -552,3 +560,197 @@ t.test(durhamHeights, chapHeights, paired=FALSE)
     ##  67.58886  66.64259
 
 Our **p-value** is above our threshold of 0.05, thus we **fail to reject the null hypothesis**, meaning we don't have sufficient evidence to rule out the possibility that the heights are the same in both cities.
+
+### Repeated measures ANOVA
+
+Earlier we discussed how to compare the means of two variables that were measured from the same population (*see* [paired-samples t-test](#paired-samples-t-test)). What if you have three (or more) variables that you'd like to compare. For instance, in the paired-samples t-test discussion we compared fixation time on the noses of athletes vs Nobel lauretes. But we also have a third category: movie stars. If this was our experimental design, the appropriate thing to do would be to compare the dependent variable (nose fixation time) across all 3 levels of our independent variable (movie stars, athletes, Nobel laureates). A t-test won't cut it. We need to use a related test called **analysis of variance**, or **ANOVA**.
+
+Since our variables represent repeated observations made on the same subject, the particular flavor of ANOVA we need is **repeated measures ANOVA**. A repeated measures ANOVA is akin to a paired samples t-test for when you have three or more variables you'd like to compare.
+
+An **ANOVA** will report whether the means of *any* of your variables are different from each other, but it won't tell you which ones. If (**and only if**) your ANOVA is significant, you can begin to do pair-wise comparisions to directly test which variables are different from each other. But if your ANOVA **isn't** significant, these pair-wise tests aren't justified.
+
+Say you want to test the hypothesis that fixation time on the nose of movie stars is greater than the fixation time on the nose of athletes. First, we have to run the **repeated measures ANOVA** to see if there is a significant different between *any* of our image categories.
+
+First we have to reformat our data to *long* format. Instead of one subject per row, and multiple observations under different conditions along the columns, we want each row to represent a single observation, and a new variable that describes which condition it belongs to. Here's a portion of our *wide* format table:
+
+``` r
+head(dt)
+```
+
+    ##            IQ noseMovie noseAthlete noseNobel ID
+    ## subject_1 100    199.78      317.33    415.08  1
+    ## subject_2  57    228.94      261.23    368.76  2
+    ## subject_3  96    316.19      262.32    382.98  3
+    ## subject_4  82    232.23      294.83    328.46  4
+    ## subject_5  89    277.99      288.21    307.44  5
+    ## subject_6 114    267.32      309.15    323.58  6
+
+Here's how to reshape it to *long* format and view it again:
+
+``` r
+# first reshape our datatable so one col is the DV (nose fixation time), and another describes the levels of the IV (image category)
+dt_long <- melt(dt, id.vars="ID", measure.vars = c("noseMovie", "noseAthlete", "noseNobel"), variable.name="imageType", value.name="noseFixTime")
+dt_long$ID = factor(dt_long$ID)    # make the ID column a factor variable
+
+head(dt_long)
+```
+
+    ##   ID imageType noseFixTime
+    ## 1  1 noseMovie      199.78
+    ## 2  2 noseMovie      228.94
+    ## 3  3 noseMovie      316.19
+    ## 4  4 noseMovie      232.23
+    ## 5  5 noseMovie      277.99
+    ## 6  6 noseMovie      267.32
+
+You can think of the ID column as subject name. Each unique ID is repeated 3 times in the full table, once for every unique imageType. Now that the data is formatted properly, we can run the repeated measures ANOVA:
+
+``` r
+library(nlme)
+
+rmANOVA <- lme(noseFixTime ~ imageType, random = ~1 | ID/imageType, data=dt_long, method="ML")
+summary(rmANOVA)
+```
+
+    ## Linear mixed-effects model fit by maximum likelihood
+    ##  Data: dt_long 
+    ##        AIC      BIC    logLik
+    ##   1196.102 1212.827 -592.0511
+    ## 
+    ## Random effects:
+    ##  Formula: ~1 | ID
+    ##         (Intercept)
+    ## StdDev:    5.472998
+    ## 
+    ##  Formula: ~1 | imageType %in% ID
+    ##         (Intercept) Residual
+    ## StdDev:    32.15756 8.145121
+    ## 
+    ## Fixed effects: noseFixTime ~ imageType 
+    ##                        Value Std.Error DF  t-value p-value
+    ## (Intercept)          249.809  5.383749 78 46.40057       0
+    ## imageTypenoseAthlete  48.546  7.512218 78  6.46227       0
+    ## imageTypenoseNobel    92.990  7.512218 78 12.37850       0
+    ##  Correlation: 
+    ##                      (Intr) imgTyA
+    ## imageTypenoseAthlete -0.698       
+    ## imageTypenoseNobel   -0.698  0.500
+    ## 
+    ## Standardized Within-Group Residuals:
+    ##          Min           Q1          Med           Q3          Max 
+    ## -0.784121770 -0.153958306  0.002543437  0.143654081  0.626800011 
+    ## 
+    ## Number of Observations: 120
+    ## Number of Groups: 
+    ##                ID imageType %in% ID 
+    ##                40               120
+
+The **p-value** indicates that there is a significant effect of **imageType** on **nose fixation time**. But we have 3 categories of imageType. How do these categories differ from each other. Since our ANOVA was significant, we are justified in comparing the categories against each other. We do so though what are called **post hoc t-tests**. There's a convenient R function to run post-hoc t-tests on your ANOVA results:
+
+``` r
+# install.packages("multcomp")
+library(multcomp)
+
+postHoc <- glht(rmANOVA, linfct=mcp(imageType="Tukey"))
+summary(postHoc)
+```
+
+    ## 
+    ##   Simultaneous Tests for General Linear Hypotheses
+    ## 
+    ## Multiple Comparisons of Means: Tukey Contrasts
+    ## 
+    ## 
+    ## Fit: lme.formula(fixed = noseFixTime ~ imageType, data = dt_long, 
+    ##     random = ~1 | ID/imageType, method = "ML")
+    ## 
+    ## Linear Hypotheses:
+    ##                              Estimate Std. Error z value Pr(>|z|)    
+    ## noseAthlete - noseMovie == 0   48.546      7.418   6.545  < 1e-09 ***
+    ## noseNobel - noseMovie == 0     92.990      7.418  12.536  < 1e-09 ***
+    ## noseNobel - noseAthlete == 0   44.444      7.418   5.992 4.66e-09 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## (Adjusted p values reported -- single-step method)
+
+Looking at this output you can see pair-wise comparisons between all 3 levels of our imageType variable. The **p-values** in this table indicate that the nose fixation time was significantly different between all 3 image categories. Let's make a box plot to visualize this better:
+
+``` r
+ggplot(dt_long, aes(x=imageType, y=noseFixTime)) +
+  geom_boxplot(fill="#A4A4A4") + 
+  ylim(0,500)
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-24-1.png)
+
+### One-way ANOVA
+
+Just like a **repeated measures ANOVA** is akin to a **paired-samples t-test** for when you have 3 or more observations from the same subjects, a **one-way ANOVA** is akin to a **independent samples t-test** for when you have multiple observations from different subjects.
+
+Let's return to our earlier question of who's taller: Durhamites, or Chapel Hillionians. Say we wanted to expand the scope of our study and measure Raleighanders as well. Let's make-up that data and look at the distribututions of all 3 groups.
+
+``` r
+# generate sample data from normal distributions
+raleighHeights = rnorm(200, mean=66, sd=5)
+ral = rep("ral", 200)
+
+
+# make dataframe
+city <- c(durm, ch, ral)
+heights <- c(durhamHeights, chapHeights, raleighHeights)
+height_dt <- data.frame(city, heights)
+
+# specify group colors to match the earlier durh/ch distribution
+city.colors = c(ral="#53B400", ch="#F8766D", durm="#00B6EB")
+
+# plot the two distibutions
+ggplot(height_dt, aes(x=heights, fill=city)) +
+  geom_density(alpha=0.3) +
+  xlim(40, 90) +
+  ggtitle("Distribution of heights by city") +
+  scale_fill_manual(values=city.colors)
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-25-1.png)
+
+It looks like the mean height for Raleigh is even maybe shorter than Chapel Hill or Durham. Running a **one-way ANOVA** will help us examine this question better.
+
+``` r
+owANOVA <- aov(heights ~ city, data=height_dt)
+summary(owANOVA)
+```
+
+    ##              Df Sum Sq Mean Sq F value Pr(>F)  
+    ## city          2    213   106.4   3.786 0.0232 *
+    ## Residuals   597  16776    28.1                 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+The **p-value** indicates there is a significant effect of city on heights. We are justified in exploring this further through post hoc t-tests. For a one-way ANOVA between subjects, this is even easier:
+
+``` r
+TukeyHSD(owANOVA)
+```
+
+    ##   Tukey multiple comparisons of means
+    ##     95% family-wise confidence level
+    ## 
+    ## Fit: aov(formula = heights ~ city, data = height_dt)
+    ## 
+    ## $city
+    ##                diff       lwr        upr     p adj
+    ## durm-ch   0.9462604 -0.299232  2.1917527 0.1754484
+    ## ral-ch   -0.4883482 -1.733841  0.7571442 0.6270583
+    ## ral-durm -1.4346085 -2.680101 -0.1891162 0.0191464
+
+This report shows us the pair-wise comparisons between the heights of each city. The only comparison that is significant (at our **p-value** threshold of 0.05) is Raleigh - Durham. Let's plot the means by city.
+
+``` r
+ggplot(height_dt, aes(x=city, y=heights)) +
+  geom_boxplot(fill="#A4A4A4") + 
+  ylim(0,90)
+```
+
+![](basicStats_files/figure-markdown_github/unnamed-chunk-28-1.png)
+
+So we can report that the average height of individuals from Raleigh is significantly less than the average height of individuals from Durham. There are no other significant differences found in this sample.
