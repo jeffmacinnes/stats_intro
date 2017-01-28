@@ -189,7 +189,7 @@ With inferential statistics, the **true** state of the world is unknown. You don
 If we're thinking about our normal distribution question above, we have two possibilities. Or let's call them *hypotheses*:
 
 -   **hypothesis 1:** the data **really are** normally distributed
--   **hypothesis 2:** the data **really are *not* ** normally distributed
+-   **hypothesis 2:** the data **really are not** normally distributed
 
 You can either conclude that hypothesis 1 is correct, or conclude that hypothesis 2 is correct. So, there are 4 possible outcomes:
 
